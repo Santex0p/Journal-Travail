@@ -9,3 +9,78 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+
+
+.content form {
+    display: flex;
+    justify-content: center;
+}
+
+.buttons-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espacio entre los botones */
+    align-items: flex-start; /* Alinea los botones a la izquierda */
+    margin-left: 20px;
+
+}
+
+.buttons-form button {
+    border: 1px solid #000000;
+    cursor: pointer;
+}
+
+.td-select {
+    border-left: 1px solid #000000;
+}
+
+textarea{
+    display: block;
+    border-left: 1px solid #000000;
+    resize: none;
+    height: auto;
+}
+
+input {
+    border-left: 1px solid #000000;
+}
+
+select {
+    width: 100%;
+    cursor: pointer;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+.section-1 {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #000000;
+}
+
+.task-title {
+    text-align: center;
+    font-size: 1.5rem;
+    padding: 1rem 0;
+    font-weight: bold;
+}
+
+.week-space {
+    display: flex;
+    justify-content: center;
+}
+
+tr {
+    border: 1px solid #000000;
+}
+
+.week-title {
+    background-color: rgba(191, 227, 213, 0.75);
+}
+
+.week-table {
+    margin-bottom: 30px;
+}
+
