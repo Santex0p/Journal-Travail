@@ -19,7 +19,7 @@
                 </nav>
         </header>
         <div class="content">
-            <form action="/create" method="POST">
+            <form action="/create-weeks" method="POST">
                 @csrf
             <table>
                 <tr>

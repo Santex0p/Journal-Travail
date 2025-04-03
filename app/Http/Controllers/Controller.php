@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 use Illuminate\View\View;
+use function PHPUnit\Framework\matches;
 
 class Controller
 {
     public function index() : View
     {
-        for ($i = 1; $i < 25 + 1; $i++)
-        {
-            $tasks[] = "task-$i";
-        }
-        return view('index', ['tasks' => $tasks]);
+        return match (request()->route()->getName()) {
+            '' => view('dashboard'),
+            'login.view' => view('login'),
+            default => view('dashboard'),
+        };
     }
 }

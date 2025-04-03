@@ -53,6 +53,7 @@ select {
 
 table {
     border-collapse: collapse;
+    margin-bottom: 30px;
 }
 
 .section-1 {
