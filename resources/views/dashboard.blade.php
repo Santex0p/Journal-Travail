@@ -21,32 +21,33 @@
         <div class="content">
             <form action="/create" method="POST">
                 @csrf
-                <table>
+                <table class="user-info">
                     <tr>
                         <td>{{Auth::user()->name}}</td>
-                    </tr>
-                    <tr>
                         <td>{{Auth::user()->email}}</td>
                     </tr>
                 </table>
             </form>
-            <form action="/logout" method="POST">
-                @csrf
-                <button type="submit">Logout</button>
-            </form>
             <form action="/create" method="POST">
                 @csrf
-            <table>
+            <table class="journal-table">
                 <thead>
                 <tr>
-                    <th>Creation<th>
+                    <th>Creation</th>
                     <th>Mes Journals</th>
                 </tr>
                 </thead>
+                <tbody>
                 <tr>
-                    <td><button type="submit">Créer un nouveau project</button></td>
+                    <td><button class="btn-create-journal" type="submit">Créer un nouveau project</button></td>
+                    <td>Journal-Example</td>
                 </tr>
+                </tbody>
             </table>
+            </form>
+            <form action="/logout" method="POST">
+                @csrf
+                <button class="btn-logout" type="submit">Logout</button>
             </form>
         </div>
     </body>

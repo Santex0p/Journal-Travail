@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('plaLinks');
 
             $table->foreignId('idTask')->references('id')->on('t_tasks')->ondelete('cascade');
+            $table->index('idTask');
             $table->timestamps();
         });
 

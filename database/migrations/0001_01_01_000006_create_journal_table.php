@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('t_journal', function (Blueprint $table) {
             $table->id();
-            $table->string('jouHours');
+            $table->integer('jouHours');
             $table->string('jouDescription');
             $table->string('jouLinks');
 
             $table->foreignId('idTask')->references('id')->on('t_tasks')->ondelete('cascade');
+            $table->index('idTask');
             $table->timestamps();
         });
 

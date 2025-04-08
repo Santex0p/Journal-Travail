@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class TaskController extends Controller

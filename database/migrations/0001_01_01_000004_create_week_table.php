@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('t_weeks', function (Blueprint $table) {
             $table->id();
             $table->string('weeName');
-            $table->string('weeStartDate');
-            $table->string('weeEndDate');
+            $table->date('weeStartDate');
+            $table->date('weeEndDate');
 
             $table->foreignId('idData')->references('id')->on('t_data')->ondelete('cascade');
+            $table->index('idData');
             $table->timestamps();
         });
 

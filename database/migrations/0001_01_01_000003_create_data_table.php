@@ -17,13 +17,14 @@ return new class extends Migration
             $table->string('datName');
             $table->string('datClass');
             $table->string('datPlace');
-            $table->string('datStartDate');
-            $table->string('datEndDate');
-            $table->string('datNbWeeks');
-            $table->string('datNbHour');
-            $table->string('datNbPeriod');
+            $table->date('datStartDate');
+            $table->date('datEndDate');
+            $table->integer('datNbWeeks');
+            $table->integer('datNbHour');
+            $table->integer('datNbPeriod');
 
-            $table->foreignId('email')->references('email')->on('users')->ondelete('cascade');
+            $table->foreignId('idUser')->references('id')->on('users')->ondelete('cascade');
+            $table->index('idUser');
             $table->timestamps();
         });
 
