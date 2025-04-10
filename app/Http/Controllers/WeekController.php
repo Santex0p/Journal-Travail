@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataProject;
+use App\Models\Journal;
+use App\Models\Planning;
+use App\Models\Tasks;
+use App\Models\Weeks;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -24,8 +30,6 @@ class WeekController extends Controller
         }
         while(!empty($request->input('task-' . $nbTasks)));
 
-        //dd($request->all());
-
         $validatedData = $request->validate([
             'module' => 'required|string|max:255',
             'name' => 'required|string|max:255',
@@ -39,7 +43,8 @@ class WeekController extends Controller
         ]);
 
         // Insert data
-        $dataId = DB::table('t_data')->insertGetId([
+
+        $dataId = DataProject::query()->insertGetId([
             'idUser' => auth()->id(), // fKey user
             'datModule' => $request->input('module'),
             'datName' => $request->input('name'),
@@ -54,10 +59,12 @@ class WeekController extends Controller
             'updated_at' => now(),
         ]);
 
+
         // Insert Weeks
-        for($i = 0; $i <= $nbWeeks; $i++)
+        $weeksId = [];
+        for($i = 0; $i < $nbWeeks; $i++)
         {
-            $weeksId = DB::table('t_weeks')->insertGetId([
+            $weeksId[] = Weeks::query()->insertGetId([
                 'weeName' => 'Semain ' . $i,
                 'weeStartDate' => now(),
                 'weeEndDate' => now(),
@@ -74,41 +81,37 @@ class WeekController extends Controller
                 $input[] = $request->input('task-' . $i);
             }
         }
-        //dd($input);
-
-        //dd($rulesTasks);
 
         $validatedTasks = $request->validate($rulesTasks);
-        //dd($validatedTasks);
-
-
 
 
         $tasksToInsert = [];
-        $tasksToInsert[] = [
-            'taskName' => $request->input('obligatory-task'),
-            'taskDescription' => '',
-            'idWeeks' => DB::table('t_weeks')->where('id', $weeksId)->value('id'),
-            'idData' => DB::table('t_data')->where('id', $dataId)->value('id'),
-            'created_at' => now(),
-            'updated_at' => now(),
-            ];
-        for ($i = 1; $i <= $nbTasks; $i++) {
+        for ($i = 1; $i < $nbTasks; $i++) {
             if (!empty($validatedTasks['task-' . $i])) {
                 $tasksToInsert[] = [
                     'taskName' => $validatedTasks['task-' . $i],
                     'taskDescription' => '',
-                    'idWeeks' => DB::table('t_weeks')->where('id', $weeksId)->value('id'),
-                    'idData' => DB::table('t_data')->where('id', $dataId)->value('id'),
+                    'idWeeks' => $weeksId[($i - 1) % count($weeksId)],
+                    'idData' => $dataId,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
         }
 
+        $tasksToInsertWithID = [];
+
         if (!empty($tasksToInsert)) {
-            DB::table('t_tasks')->insert($tasksToInsert);
+            foreach ($tasksToInsert as $taskIndex => $task)
+            {
+                $taskID = Tasks::query()->insertGetId($task);
+                //$task[$task]['taskID'] = $task;
+                $tasksToInsert[$taskIndex]['taskID'] = $taskID;
+
+            }
         }
+        //dd($tasksToInsert);
+        //dd($tasksToInsert);
 
 
         return match ($type) {
@@ -117,5 +120,46 @@ class WeekController extends Controller
             'diagram' => view('diagram'),
             default => view('index'),
         };
+    }
+
+    public function saveData(Request $request) : RedirectResponse
+    {
+        //dd($request->input());
+        //$project = DataProject::query()->where('id', auth()->id());
+        //foreach ($request->input() as $ => $value) {}
+        $weeksData = $request->input('weeks');
+
+        foreach ($weeksData as $nbWeek => $data)
+        {
+            foreach ($data['tasks'] as $taskIndex => $taskData)
+            {
+                switch ($request->input('type')) {
+                    case 'journal':
+                        Journal::query()->insert([
+                            'jouHours' => $taskData['time'],
+                            'jouDescription' => $taskData['desc'],
+                            'jouLinks' => $taskData['links'],
+                            'idTask' => $taskData['option'],
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        break;
+                    case 'planning':
+                        Planning::query()->insert([
+                            'plaHours' => $taskData['time'],
+                            'plaDescription' => $taskData['desc'],
+                            'plaLinks' => $taskData['links'],
+                            'idTask' => $taskData['option'],
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        break;
+                }
+            }
+        }
+
+
+
+        return redirect()->route('dashboard')->with('success', 'Data saved');
     }
 }

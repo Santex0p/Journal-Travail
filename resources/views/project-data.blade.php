@@ -63,7 +63,7 @@
                 </tr>
                 <tr>
                     <td>Tache Obligatoire:</td>
-                    <td><input type="text" name="obligatory-task" value="Absence - Imprevus" readonly></td>
+                    <td><input type="text" name="task-1" value="Absence - Imprevus" readonly></td>
                 </tr>
                 @foreach ($tasks as $index => $task)
                     <tr>

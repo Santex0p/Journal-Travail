@@ -13,7 +13,7 @@ class AuthController extends Controller
 
     public function index(Request $request): View | RedirectResponse
     {
-        $projects = DataProject::query()->where('id', auth()->id())->get();
+        $projects = DataProject::query()->where('id', auth()->id());
 
         if($request->route()->getName() == 'index')
         {

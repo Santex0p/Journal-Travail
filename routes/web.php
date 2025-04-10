@@ -23,4 +23,5 @@ Route::get('/', [AuthController::class, 'index'])->name('index');
 Route::get('/login', [AuthController::class, 'index'])->name('login');
 Route::post('/auth', [AuthController::class, 'login'])->name('auth');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/save-weeks', [WeekController::class, 'saveData'])->name('save.weeks');
 //Route::fallback(function () {return redirect()->route('dashboard')->with('error', 'Page not found');});

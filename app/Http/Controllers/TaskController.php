@@ -15,7 +15,7 @@ class TaskController extends Controller
     {
         $tasks = [];
         $nbTasks = 25;
-        for ($i = 1; $i < $nbTasks + 1; $i++)
+        for ($i = 2; $i < $nbTasks + 2; $i++) // + 2 to avoid fields 0 and 1 which are reserved
         {
             $tasks[] = "task-$i";
         }
