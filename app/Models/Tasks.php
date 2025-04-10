@@ -21,7 +21,7 @@ class Tasks extends Model
 
     public function week()
     {
-        return $this->belongsTo(Weeks::class, 'idWeek'); // Relación con Weeks
+        return $this->belongsTo(Weeks::class, 'idWeeks'); // Relación con Weeks
     }
 
 

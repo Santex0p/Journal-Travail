@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataProject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -13,7 +14,8 @@ class TaskController extends Controller
     public function create(): View
     {
         $tasks = [];
-        for ($i = 1; $i < 25 + 1; $i++)
+        $nbTasks = 25;
+        for ($i = 1; $i < $nbTasks + 1; $i++)
         {
             $tasks[] = "task-$i";
         }

@@ -18,9 +18,12 @@
                 <nav class="">
                 </nav>
         </header>
+
         <div class="week-space">
             <form action="/create" method="POST">
                 @csrf
+
+
 
                 @for($i = 1; $i < $nbWeeks + 1; $i++)
                     <table class="week-table">
@@ -40,7 +43,9 @@
                         <tr>
                             <td class="td-select">
                                 <select name="task{{$i}}">
-                                    <option value="op1">Tache 1</option>
+                                    @foreach($tasksToInsert as $task)
+                                    <option value="option{{$i}}">{{$task['taskName']}}</option>
+                                    @endforeach
                                 </select></td>
                             <td class="td-select"><select name="time{{$i}}">
                                     @for($k = 0; $k < $nbHours + 1; $k++)
@@ -54,6 +59,7 @@
                         </tbody>
                     </table>
                 @endfor
+                <button type="submit">Envoyer</button>
             </form>
         </div>
     </body>

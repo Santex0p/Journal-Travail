@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataProject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,7 @@ class AuthController extends Controller
 
     public function index(Request $request): View | RedirectResponse
     {
+        $projects = DataProject::query()->where('id', auth()->id())->get();
 
         if($request->route()->getName() == 'index')
         {
@@ -22,7 +24,7 @@ class AuthController extends Controller
         {
             return view('dashboard');
         }
-        return view('login');
+        return view('login', ['projects', $projects]);
     }
 
     public function login(Request $request): RedirectResponse

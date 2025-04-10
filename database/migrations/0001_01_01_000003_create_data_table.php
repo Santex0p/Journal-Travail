@@ -20,8 +20,8 @@ return new class extends Migration
             $table->date('datStartDate');
             $table->date('datEndDate');
             $table->integer('datNbWeeks');
-            $table->integer('datNbHour');
-            $table->integer('datNbPeriod');
+            $table->integer('datNbHour')->nullable();
+            $table->integer('datNbPeriod')->nullable();
 
             $table->foreignId('idUser')->references('id')->on('users')->ondelete('cascade');
             $table->index('idUser');
