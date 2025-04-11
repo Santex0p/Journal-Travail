@@ -57,7 +57,18 @@
                         </tbody>
                     </table>
                 @endfor
-                <button type="submit" name="type" value="planning">Envoyer</button>
+                <button type="submit" name="type" value="planning">Sauvegarder</button>
+            </form>
+            <form action="/data" method="POST">
+                @csrf
+            <table>
+                <tr>
+                    <td>
+                        <input type="hidden" name="dataId" value="{{$dataId}}">
+                        <button type="submit">Voir Data</button>
+                    </td>
+                </tr>
+            </table>
             </form>
         </div>
     </body>

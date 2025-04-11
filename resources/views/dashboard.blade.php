@@ -28,7 +28,7 @@
                     </tr>
                 </table>
             </form>
-            <form action="/create" method="POST">
+            <form action="/data" method="POST">
                 @csrf
             <table class="journal-table">
                 <thead>

@@ -11,9 +11,22 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use function PHPUnit\Framework\isNumeric;
+use function PHPUnit\Framework\isString;
 
 class WeekController extends Controller
 {
+    /**
+     * Handles the creation of data and related entities such as weeks and tasks.
+     *
+     * This method validates the provided request data, inserts a new project into the `DataProject` table,
+     * creates associated weeks in the `Weeks` table, and processes task data to insert into the `Tasks` table.
+     * The final view rendered depends on the `type` specified in the request, which determines the mode of data presentation.
+     *
+     * @param Request $request The HTTP request instance containing input data for project, weeks, and tasks.
+     *
+     * @return View A view instance corresponding to the specified `type` in the request, displaying the created data and associated entities.
+     */
     public function createdata(Request $request) : View
     {
 
@@ -22,13 +35,6 @@ class WeekController extends Controller
         $nbWeeks = $request->input('nb-weeks');
         $nbFields = 5;
         $nbHours = 10;
-        $nbTasks = 0;
-
-        do
-        {
-            $nbTasks++;
-        }
-        while(!empty($request->input('task-' . $nbTasks)));
 
         $validatedData = $request->validate([
             'module' => 'required|string|max:255',
@@ -73,23 +79,29 @@ class WeekController extends Controller
                 'updated_at' => now(),
             ]);
         }
-        $input = [];
         $rulesTasks = [];
-        for ($i = 0; $i <= $nbTasks; $i++) {
-            if(!empty($request->input('task-' . $i))) {
-                $rulesTasks['task-' . $i] = 'nullable|string|max:255';
-                $input[] = $request->input('task-' . $i);
+        $indexTask = 0;
+        foreach ($request->input() as $key => $value)
+        {
+            if(!is_null($request->input($key)) && is_numeric($key))
+            {
+                $rulesTasks[$indexTask] = 'nullable|string|max:255';
+                $indexTask++;
             }
         }
+        dd($rulesTasks);
+        if (!is_null($))
+        {
 
+        }
         $validatedTasks = $request->validate($rulesTasks);
-
+        dd($validatedTasks);
 
         $tasksToInsert = [];
         for ($i = 1; $i < $nbTasks; $i++) {
-            if (!empty($validatedTasks['task-' . $i])) {
+            if (!empty($validatedTasks[$i])) {
                 $tasksToInsert[] = [
-                    'taskName' => $validatedTasks['task-' . $i],
+                    'taskName' => $validatedTasks[$i],
                     'taskDescription' => '',
                     'idWeeks' => $weeksId[($i - 1) % count($weeksId)],
                     'idData' => $dataId,
@@ -105,7 +117,6 @@ class WeekController extends Controller
             foreach ($tasksToInsert as $taskIndex => $task)
             {
                 $taskID = Tasks::query()->insertGetId($task);
-                //$task[$task]['taskID'] = $task;
                 $tasksToInsert[$taskIndex]['taskID'] = $taskID;
 
             }
@@ -115,18 +126,26 @@ class WeekController extends Controller
 
 
         return match ($type) {
-            'planning' => view('planning-weeks' , ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert]),
-            'journal' => view('journal-weeks'),
+            'planning' => view('planning-weeks' , ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId]),
+            'journal' => view('journal-weeks',['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert]),
             'diagram' => view('diagram'),
             default => view('index'),
         };
     }
 
+    /**
+     * Handles the saving of weekly data into the database.
+     *
+     * This method processes the input data from the request and saves it
+     * into the database based on the type specified in the request. The
+     * type determines whether the data is saved in the `Journal` or `Planning` table.
+     *
+     * @param Request $request The HTTP request instance containing the input data.
+     *
+     * @return RedirectResponse A redirect response to the dashboard route with a success message.
+     */
     public function saveData(Request $request) : RedirectResponse
     {
-        //dd($request->input());
-        //$project = DataProject::query()->where('id', auth()->id());
-        //foreach ($request->input() as $ => $value) {}
         $weeksData = $request->input('weeks');
 
         foreach ($weeksData as $nbWeek => $data)
@@ -135,7 +154,7 @@ class WeekController extends Controller
             {
                 switch ($request->input('type')) {
                     case 'journal':
-                        Journal::query()->insert([
+                        Journal::query()->UpdateOrInsert([
                             'jouHours' => $taskData['time'],
                             'jouDescription' => $taskData['desc'],
                             'jouLinks' => $taskData['links'],
@@ -145,7 +164,7 @@ class WeekController extends Controller
                         ]);
                         break;
                     case 'planning':
-                        Planning::query()->insert([
+                        Planning::query()->UpdateOrInsert([
                             'plaHours' => $taskData['time'],
                             'plaDescription' => $taskData['desc'],
                             'plaLinks' => $taskData['links'],

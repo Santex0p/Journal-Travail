@@ -12,8 +12,8 @@ use \App\Http\Controllers\TaskController;
 
 
 Route::middleware('auth')->group(function () {
-    Route::post('/create', [TaskController::class, 'create'])->name('create.data');
-    Route::post('/create-weeks', [WeekController::class, 'createdata'])->name('create.weeks');
+    Route::post('/data', [TaskController::class, 'create'])->name('create.data');
+    Route::post('/weeks', [WeekController::class, 'createdata'])->name('create.weeks');
     Route::get('/dashboard', [AuthController::class, 'index'])->name('dashboard');
 });
 
