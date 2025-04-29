@@ -158,7 +158,6 @@ class WeekController extends Controller
                             'jouHours' => $taskData['time'],
                             'jouDescription' => $taskData['desc'],
                             'jouLinks' => $taskData['links'],
-                            'created_at' => now(),
                             'updated_at' => now(),
                         ]);
                         break;
@@ -172,7 +171,6 @@ class WeekController extends Controller
                             'plaHours' => $taskData['time'],
                             'plaDescription' => $taskData['desc'],
                             'plaLinks' => $taskData['links'],
-                            'created_at' => now(),
                             'updated_at' => now(),
                         ]);
                         break;

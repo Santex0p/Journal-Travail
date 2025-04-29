@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('plaHours');
             $table->string('plaDescription');
             $table->string('plaLinks');
+            $table->string('taskIndex');
 
             $table->foreignId('idTask')->references('id')->on('t_tasks')->ondelete('cascade');
             $table->index('idTask');

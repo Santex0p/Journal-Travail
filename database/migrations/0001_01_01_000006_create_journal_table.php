@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('jouHours');
             $table->string('jouDescription');
             $table->string('jouLinks');
+            $table->string('taskIndex');
 
             $table->foreignId('idTask')->references('id')->on('t_tasks')->ondelete('cascade');
             $table->index('idTask');

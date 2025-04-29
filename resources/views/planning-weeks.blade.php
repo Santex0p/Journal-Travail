@@ -53,6 +53,7 @@
                             <td><textarea type="text" name="weeks[{{$weekId}}][tasks][{{$j}}][desc]">desc{{$j}}</textarea></td>
                             <td><textarea type="text" name="weeks[{{$weekId}}][tasks][{{$j}}][links]">links{{$j}}</textarea></td>
                         </tr>
+                        <input type="hidden" name="weeks[{{ $weekId }}][tasks][{{ $j }}][task_index]" value="{{ $j }}">
                         @endfor
                         </tbody>
                     </table>
