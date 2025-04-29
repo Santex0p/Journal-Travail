@@ -32,7 +32,7 @@ class WeekController extends Controller
 
 
         $type = $request->input('type');
-        $nbWeeks = $request->input('nb-weeks');
+        $nbWeeks = $request->input('nb-weeks') + 1;
         $nbFields = 5;
         $nbHours = 10;
 
@@ -68,7 +68,7 @@ class WeekController extends Controller
 
         // Insert Weeks
         $weeksId = [];
-        for($i = 0; $i < $nbWeeks; $i++)
+        for($i = 1; $i < $nbWeeks; $i++)
         {
             $weeksId[] = Weeks::query()->insertGetId([
                 'weeName' => 'Semain ' . $i,
@@ -80,7 +80,7 @@ class WeekController extends Controller
             ]);
         }
         $rulesTasks = [];
-        $indexTask = 0;
+        $indexTask = 1; // Number of task to validate NOTE: 1 is the first task, no 0
         foreach ($request->input() as $key => $value)
         {
             if(!is_null($request->input($key)) && is_numeric($key))
@@ -89,21 +89,17 @@ class WeekController extends Controller
                 $indexTask++;
             }
         }
-        dd($rulesTasks);
-        if (!is_null($))
-        {
 
-        }
+        // To validate tasks
         $validatedTasks = $request->validate($rulesTasks);
-        dd($validatedTasks);
 
         $tasksToInsert = [];
-        for ($i = 1; $i < $nbTasks; $i++) {
+        for ($i = 1; $i < $indexTask; $i++) {
             if (!empty($validatedTasks[$i])) {
                 $tasksToInsert[] = [
                     'taskName' => $validatedTasks[$i],
                     'taskDescription' => '',
-                    'idWeeks' => $weeksId[($i - 1) % count($weeksId)],
+                    //'idWeeks' => $weeksId[($i - 1) % count($weeksId)],
                     'idData' => $dataId,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -111,8 +107,7 @@ class WeekController extends Controller
             }
         }
 
-        $tasksToInsertWithID = [];
-
+        //$tasksToInsertWithID = [];
         if (!empty($tasksToInsert)) {
             foreach ($tasksToInsert as $taskIndex => $task)
             {
@@ -121,12 +116,10 @@ class WeekController extends Controller
 
             }
         }
-        //dd($tasksToInsert);
-        //dd($tasksToInsert);
 
 
         return match ($type) {
-            'planning' => view('planning-weeks' , ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId]),
+            'planning' => view('planning-weeks' , ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId]),
             'journal' => view('journal-weeks',['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert]),
             'diagram' => view('diagram'),
             default => view('index'),
@@ -147,6 +140,8 @@ class WeekController extends Controller
     public function saveData(Request $request) : RedirectResponse
     {
         $weeksData = $request->input('weeks');
+        $dataId = $request->input('dataId');
+        //dd($weeksData);
 
         foreach ($weeksData as $nbWeek => $data)
         {
@@ -155,20 +150,28 @@ class WeekController extends Controller
                 switch ($request->input('type')) {
                     case 'journal':
                         Journal::query()->UpdateOrInsert([
+                            'idTask' => $taskData['option'],
+                            'idProject' => $dataId,
+                            'idWeeks' => $nbWeek,
+                            ],
+                            [
                             'jouHours' => $taskData['time'],
                             'jouDescription' => $taskData['desc'],
                             'jouLinks' => $taskData['links'],
-                            'idTask' => $taskData['option'],
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
                         break;
                     case 'planning':
                         Planning::query()->UpdateOrInsert([
+                            'idTask' => $taskData['option'],
+                            'idProject' => $dataId,
+                            'idWeeks' => $nbWeek,
+                            ],
+                            [
                             'plaHours' => $taskData['time'],
                             'plaDescription' => $taskData['desc'],
                             'plaLinks' => $taskData['links'],
-                            'idTask' => $taskData['option'],
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);

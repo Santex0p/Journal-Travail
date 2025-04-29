@@ -23,11 +23,11 @@
             <form action="/save-weeks" method="POST">
                 @csrf
                 @php $input = 1 @endphp
-                @for($i = 1; $i < $nbWeeks + 1; $i++)
+                @foreach($weeksId as $weekId)
                     <table class="week-table">
                         <thead>
                         <tr>
-                            <th colspan="4" class="week-title">Semaine {{$i}}</th>
+                            <th colspan="4" class="week-title">Semaine {{$input++}}</th>{{--To number the weeks--}}
                         </tr>
                         <tr>
                             <th>Tâche</th>
@@ -40,23 +40,24 @@
                         @for($j = 1; $j < $nbFields + 1; $j++) {{--Input to take all task--}}
                         <tr>
                             <td class="td-select">
-                                <select name="weeks[{{$i}}][tasks][{{$j}}][option]">
+                                <select name="weeks[{{$weekId}}][tasks][{{$j}}][option]">
                                     @foreach($tasksToInsert as $task)
                                     <option value="{{$task['taskID']}}">{{$task['taskName']}}</option>
                                     @endforeach
                                 </select></td>
-                            <td class="td-select"><select name="weeks[{{$i}}][tasks][{{$j}}][time]">
+                            <td class="td-select"><select name="weeks[{{$weekId}}][tasks][{{$j}}][time]">
                                     @for($k = 0; $k < $nbHours + 1; $k++)
                                         <option name="{{$k}}" value="{{$k}}">{{$k}}h</option>
                                     @endfor
                                 </select></td>
-                            <td><textarea type="text" name="weeks[{{$i}}][tasks][{{$j}}][desc]">desc{{$j}}</textarea></td>
-                            <td><textarea type="text" name="weeks[{{$i}}][tasks][{{$j}}][links]">links{{$j}}</textarea></td>
+                            <td><textarea type="text" name="weeks[{{$weekId}}][tasks][{{$j}}][desc]">desc{{$j}}</textarea></td>
+                            <td><textarea type="text" name="weeks[{{$weekId}}][tasks][{{$j}}][links]">links{{$j}}</textarea></td>
                         </tr>
                         @endfor
                         </tbody>
                     </table>
-                @endfor
+                    @endforeach
+                <input type="hidden" name="dataId" value="{{$dataId}}">
                 <button type="submit" name="type" value="planning">Sauvegarder</button>
             </form>
             <form action="/data" method="POST">

@@ -13,16 +13,12 @@ class Tasks extends Model
         'taskDescription',
     ];
 
-    public function dataProject()
+    public function dataProject(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(DataProject::class, 'idDataProject'); // Relación con DataProject
     }
 
 
-    public function week()
-    {
-        return $this->belongsTo(Weeks::class, 'idWeeks'); // Relación con Weeks
-    }
 
 
 }

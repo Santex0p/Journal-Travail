@@ -15,25 +15,25 @@ class Weeks extends Model
     ];
 
 
-    public function planning()
+    public function planning(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasOne(Planning::class, 'idWeek');
+        return $this->hasMany(Planning::class, 'idWeek');
     }
 
     /**
      * Relación con Journal (Weeks de journal).
      */
-    public function journal()
+    public function journal(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasOne(Journal::class, 'idWeek');
+        return $this->hasMany(Journal::class, 'idWeek');
     }
 
-    public function tasks()
+    public function tasks(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Tasks::class, 'idWeek'); // Clave foránea en t_tasks
     }
 
-    public function data()
+    public function data(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(DataProject::class, 'idDataProject');
     }

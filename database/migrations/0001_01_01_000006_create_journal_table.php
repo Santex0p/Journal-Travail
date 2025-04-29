@@ -19,6 +19,10 @@ return new class extends Migration
 
             $table->foreignId('idTask')->references('id')->on('t_tasks')->ondelete('cascade');
             $table->index('idTask');
+            $table->foreignId('idProject')->references('id')->on('t_data')->ondelete('cascade');
+            $table->index('idProject');
+            $table->foreignId('idWeeks')->constrained('t_weeks')->onDelete('cascade');
+            $table->index('idWeeks');
             $table->timestamps();
         });
 

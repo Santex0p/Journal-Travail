@@ -46,7 +46,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function projects()
+    public function projects(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(DataProject::class, 'idUser'); // Clave foránea en t_data
     }

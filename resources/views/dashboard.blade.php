@@ -18,37 +18,55 @@
                 <nav class="">
                 </nav>
         </header>
-        <div class="content">
-            <form action="/create" method="POST">
-                @csrf
+        <div class="content-user">
                 <table class="user-info">
                     <tr>
                         <td>{{Auth::user()->name}}</td>
                         <td>{{Auth::user()->email}}</td>
                     </tr>
                 </table>
-            </form>
-            <form action="/data" method="POST">
-                @csrf
-            <table class="journal-table">
+            <div class="buttons-content">
+                <form action="/logout" method="POST">
+                    @csrf
+                    <button class="btn-logout" type="submit">Logout</button>
+                </form>
+                <form action="/data" method="POST">
+                    @csrf
+                    <button class="btn-create-journal" type="submit">Créer un nouveau project</button>
+                </form>
+            </div>
+        </div>
+        <div class="journal-table">
+            @if($projects != null)
+            <table>
                 <thead>
                 <tr>
-                    <th>Creation</th>
                     <th>Mes Journals</th>
+                    <th>Options</th>
                 </tr>
                 </thead>
                 <tbody>
+                @foreach($projects as $project)
                 <tr>
-                    <td><button class="btn-create-journal" type="submit">Créer un nouveau project</button></td>
-                    <td>Journal-Example</td>
+                    <td>{{$project['datModule']}}</td>
+                    <td>
+                        <form action="/data" method="POST">
+                        @csrf
+                        {{--Data Id in hidden to have acces to data in the next page--}}
+                        <input type="hidden" name="dataId" value="{{$project['id']}}">
+                        <button><img src="{{asset('img/pencil.png')}}" alt="edit"></button>
+                        </form>
+                        <form action="/del-project" method="GET">
+                            <button><img src="{{asset('img/trash.png')}}" alt="delete"></button>
+                        </form>
+                    </td>
                 </tr>
+                @endforeach
                 </tbody>
+                @else
+                    <p>Aucun projet pour l'instant</p>
+                @endif
             </table>
-            </form>
-            <form action="/logout" method="POST">
-                @csrf
-                <button class="btn-logout" type="submit">Logout</button>
-            </form>
         </div>
     </body>
 </html>

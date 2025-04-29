@@ -16,6 +16,7 @@
     <body class="">
         <header class="">
                 <nav class="">
+                    <a href="/">Dashboard</a>
                 </nav>
         </header>
         <div class="content">
@@ -23,7 +24,7 @@
                 @csrf
             <table>
                 <tr>
-                    <td>Module:</td>
+                    <td>Module - Nom Project:</td>
                     <td><input type="text" name="module" value="{{$data->datModule ?? ''}}"></td>
                 </tr>
                 <tr>
@@ -56,7 +57,7 @@
                 </tr>
                 <tr>
                     <td>Nombre de 1/4Heure/Periode:</td>
-                    <td><input type="text" name="nb-1/4-hours" value="{{$data->datNbPeriod}}"></td>
+                    <td><input type="text" name="nb-1/4-hours" value="{{$data->datNbPeriod ?? ''}}"></td>
                 </tr>
                 <tr>
                     <td colspan="2" class="task-title">Liste des taches</td>
@@ -76,7 +77,7 @@
             </table>
             <div class="buttons-form">
                 <button type="submit" class="btn btn-creation-diagram" name="type" value="diagram">Création diagramme</button>
-                <button type="submit" class="btn btn-creation-diagram" name="type" value="planning">Création Planning</button>
+                <button type="submit" class="btn btn-creation-diagram" name="type" value="planning">@if(isset($data->id)) Voir PLanning @else Creation Planning @endif </button>
                 <button type="submit" class="btn btn-creation-diagram" name="type" value="journal">Création Journal de travail</button>
             </div>
             </form>

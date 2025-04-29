@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataProject;
+use App\Models\Planning;
 use App\Models\Tasks;
 use Dflydev\DotAccessData\Data;
 use Illuminate\Http\RedirectResponse;
@@ -20,12 +21,19 @@ class TaskController extends Controller
             $dataId = $request->input('dataId');
             $data = DataProject::query()->get()->where('id', $dataId)->first();
             $dataTasks = Tasks::query()->get()->where('idData', $dataId)->select('taskName', 'id');
+            $planningData = Planning::query()->get()->toArray();
         }
-        //dd($dataTasks);
+        else
+        {
+            $data = null;
+        }
+        //dd($planningData);
+
 
         $tasks = [];
         $nbTasks = 25;
         $currentIndex = 1;
+        // To get Tasks of project data
         if (isset($dataTasks)) {
             foreach ($dataTasks as $dataTask) {
                 //dd($dataIndex);
@@ -36,7 +44,7 @@ class TaskController extends Controller
                 $currentIndex++;
             }
         }
-        for ($currentIndex; $currentIndex <= $nbTasks; $currentIndex++) // + 2 to avoid fields 0 and 1 which are reserved
+        for ($currentIndex; $currentIndex <= $nbTasks; $currentIndex++)
         {
             $tasks[$currentIndex]= [
                 'taskId' => null,
@@ -46,7 +54,7 @@ class TaskController extends Controller
         }
         //dd($tasks);
 
-
         return view('project-data', ['tasks' => $tasks, 'data' => $data]);
+
     }
 }

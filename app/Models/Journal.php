@@ -15,8 +15,16 @@ class Journal extends Model
         'jouLinks',
     ];
 
-    public function task()
+    public function task(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Tasks::class, 'idTask');
+    }
+    public function data(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(DataProject::class, 'idDataProject');
+    }
+    public function week(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Weeks::class, 'idWeek');
     }
 }

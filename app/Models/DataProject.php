@@ -19,17 +19,17 @@ class DataProject extends Model
         'datNbPeriod',
     ];
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'idUser');
     }
 
-    public function weeks()
+    public function weeks(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Weeks::class, 'idDataProject');
     }
 
-    public function tasks()
+    public function tasks(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Tasks::class, 'idDataProject'); // Clave foránea en t_tasks
     }

@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('taskName');
             $table->string('taskDescription');
 
-            $table->foreignId('idWeeks')->references('id')->on('t_weeks')->ondelete('cascade');
-            $table->index('idWeeks');
             $table->foreignId('idData')->references('id')->on('t_data')->ondelete('cascade');
             $table->index('idData');
             $table->timestamps();

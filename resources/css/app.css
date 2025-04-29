@@ -15,6 +15,35 @@
 .content form {
     display: flex;
     justify-content: center;
+
+}
+
+.content-user   {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.journal-table {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.journal-table form {
+    display: inline-flex;
+    width: 25px;
+    margin: 5px;
+}
+
+.journal-table img {
+    cursor: pointer;
+}
+
+.buttons-content {
+    display: flex;
+    gap: 10px;
+    margin: 10px;
 }
 
 .buttons-form {

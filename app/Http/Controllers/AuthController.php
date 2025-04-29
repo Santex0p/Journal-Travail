@@ -13,18 +13,14 @@ class AuthController extends Controller
 
     public function index(Request $request): View | RedirectResponse
     {
-        $projects = DataProject::query()->where('id', auth()->id());
+        //$projects = DataProject::where('idUser', auth()->id())->get()->toArray();
 
-        if($request->route()->getName() == 'index')
+        if(Auth::check() && auth()->user()->projects())
         {
-            return redirect()->route('dashboard');
+            $projects = auth()->user()->projects()->get()->toArray(); //Eloquent
+            return view('dashboard', ['projects' => $projects ?? null]);
         }
-
-        if(Auth::check())
-        {
-            return view('dashboard');
-        }
-        return view('login', ['projects', $projects]);
+        return view('login');
     }
 
     public function login(Request $request): RedirectResponse
