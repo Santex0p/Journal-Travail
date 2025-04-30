@@ -75,6 +75,7 @@
                     </tr>
                 @endforeach
             </table>
+                <input type="hidden" name="data" value="{{$data}}">
             <div class="buttons-form">
                 <button type="submit" class="btn btn-creation-diagram" name="type" value="diagram">Création diagramme</button>
                 <button type="submit" class="btn btn-creation-diagram" name="type" value="planning">@if(isset($data->id)) Voir PLanning @else Creation Planning @endif </button>

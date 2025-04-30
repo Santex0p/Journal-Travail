@@ -29,7 +29,6 @@ class TaskController extends Controller
         }
         //dd($planningData);
 
-
         $tasks = [];
         $nbTasks = 25;
         $currentIndex = 1;

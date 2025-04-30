@@ -24,6 +24,7 @@
                 @csrf
                 @php $input = 1 @endphp
                 @foreach($weeksId as $weekId)
+                    @dd($weeksId)
                     <table class="week-table">
                         <thead>
                         <tr>
@@ -42,7 +43,7 @@
                             <td class="td-select">
                                 <select name="weeks[{{$weekId}}][tasks][{{$j}}][option]">
                                     @foreach($tasksToInsert as $task)
-                                    <option value="{{$task['taskID']}}">{{$task['taskName']}}</option>
+                                    <option value="{{$task['id']}}">{{$task['taskName']}}</option>
                                     @endforeach
                                 </select></td>
                             <td class="td-select"><select name="weeks[{{$weekId}}][tasks][{{$j}}][time]">

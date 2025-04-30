@@ -35,6 +35,9 @@ class WeekController extends Controller
         $nbWeeks = $request->input('nb-weeks') + 1;
         $nbFields = 5;
         $nbHours = 10;
+        $data = request()->input('data');
+
+
 
         $validatedData = $request->validate([
             'module' => 'required|string|max:255',
@@ -50,80 +53,97 @@ class WeekController extends Controller
 
         // Insert data
 
-        $dataId = DataProject::query()->insertGetId([
-            'idUser' => auth()->id(), // fKey user
-            'datModule' => $request->input('module'),
-            'datName' => $request->input('name'),
-            'datClass' => $request->input('class'),
-            'datPlace' => $request->input('location'),
-            'datStartDate' => $request->input('start-date'),
-            'datEndDate' => $request->input('end-date'),
-            'datNbWeeks' => $request->input('nb-weeks'),
-            'datNbHour' => $request->input('nb-weeks-hours'),
-            'datNbPeriod' => $request->input('nb-1/4-hours'),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-
-        // Insert Weeks
-        $weeksId = [];
-        for($i = 1; $i < $nbWeeks; $i++)
+        if ($data == null)
         {
-            $weeksId[] = Weeks::query()->insertGetId([
-                'weeName' => 'Semain ' . $i,
-                'weeStartDate' => now(),
-                'weeEndDate' => now(),
-                'idData' => $dataId,
+            $dataId = DataProject::query()->insertGetId([
+                'idUser' => auth()->id(), // fKey user
+                'datModule' => $request->input('module'),
+                'datName' => $request->input('name'),
+                'datClass' => $request->input('class'),
+                'datPlace' => $request->input('location'),
+                'datStartDate' => $request->input('start-date'),
+                'datEndDate' => $request->input('end-date'),
+                'datNbWeeks' => $request->input('nb-weeks'),
+                'datNbHour' => $request->input('nb-weeks-hours'),
+                'datNbPeriod' => $request->input('nb-1/4-hours'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-        }
-        $rulesTasks = [];
-        $indexTask = 1; // Number of task to validate NOTE: 1 is the first task, no 0
-        foreach ($request->input() as $key => $value)
-        {
-            if(!is_null($request->input($key)) && is_numeric($key))
-            {
-                $rulesTasks[$indexTask] = 'nullable|string|max:255';
-                $indexTask++;
-            }
-        }
 
-        // To validate tasks
-        $validatedTasks = $request->validate($rulesTasks);
 
-        $tasksToInsert = [];
-        for ($i = 1; $i < $indexTask; $i++) {
-            if (!empty($validatedTasks[$i])) {
-                $tasksToInsert[] = [
-                    'taskName' => $validatedTasks[$i],
-                    'taskDescription' => '',
-                    //'idWeeks' => $weeksId[($i - 1) % count($weeksId)],
+            // Insert Weeks
+            $weeksId = [];
+            for ($i = 1; $i < $nbWeeks; $i++) {
+                $weeksId[] = Weeks::query()->insertGetId([
+                    'weeName' => 'Semain ' . $i,
+                    'weeStartDate' => now(),
+                    'weeEndDate' => now(),
                     'idData' => $dataId,
                     'created_at' => now(),
                     'updated_at' => now(),
-                ];
+                ]);
             }
-        }
-
-        //$tasksToInsertWithID = [];
-        if (!empty($tasksToInsert)) {
-            foreach ($tasksToInsert as $taskIndex => $task)
-            {
-                $taskID = Tasks::query()->insertGetId($task);
-                $tasksToInsert[$taskIndex]['taskID'] = $taskID;
-
+            $rulesTasks = [];
+            $indexTask = 1; // Number of task to validate NOTE: 1 is the first task, no 0
+            foreach ($request->input() as $key => $value) {
+                if (!is_null($request->input($key)) && is_numeric($key)) {
+                    $rulesTasks[$indexTask] = 'nullable|string|max:255';
+                    $indexTask++;
+                }
             }
-        }
 
+            // To validate tasks
+            $validatedTasks = $request->validate($rulesTasks);
+
+            $tasksToInsert = [];
+            for ($i = 1; $i < $indexTask; $i++) {
+                if (!empty($validatedTasks[$i])) {
+                    $tasksToInsert[] = [
+                        'taskName' => $validatedTasks[$i],
+                        'taskDescription' => '',
+                        //'idWeeks' => $weeksId[($i - 1) % count($weeksId)],
+                        'idData' => $dataId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+            }
+
+            if (!empty($tasksToInsert)) {
+                foreach ($tasksToInsert as $taskIndex => $task) {
+                    $taskID = Tasks::query()->insertGetId($task);
+                    $tasksToInsert[$taskIndex]['id'] = $taskID;
+
+                }
+            }
+            return match ($type) {
+                'planning' => view('planning-weeks' , ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId]),
+                'journal' => view('journal-weeks',['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert]),
+                'diagram' => view('diagram'),
+                default => view('index'),
+            };
+
+        }
+        // TODO: Fix array values in weekId
+        $arrayData = json_decode($data, true);
+
+        $tasksToInsert = Tasks::query()->get()->where('idData', $arrayData['id'])->toArray();
+        $dataId = DataProject::query()->get()->where('id', $arrayData['id'])->first()->id;
+        $weeksTableId = Weeks::where('idData', $dataId)->pluck('id')->values()->toArray();
+        dd($weeksTableId);
+        foreach ($weeksTableId as $key => $value)
+        {
+            $weeksId[] = $value['id'];
+        }
+        dd($weeksId);
 
         return match ($type) {
-            'planning' => view('planning-weeks' , ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId]),
-            'journal' => view('journal-weeks',['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert]),
+            'planning' => view('planning-weeks', ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId]),
+            'journal' => view('journal-weeks'),
             'diagram' => view('diagram'),
             default => view('index'),
         };
+
     }
 
     /**
@@ -141,7 +161,6 @@ class WeekController extends Controller
     {
         $weeksData = $request->input('weeks');
         $dataId = $request->input('dataId');
-        //dd($weeksData);
 
         foreach ($weeksData as $nbWeek => $data)
         {
@@ -153,6 +172,7 @@ class WeekController extends Controller
                             'idTask' => $taskData['option'],
                             'idProject' => $dataId,
                             'idWeeks' => $nbWeek,
+                            'taskIndex' => $taskData['task_index'],
                             ],
                             [
                             'jouHours' => $taskData['time'],
@@ -166,6 +186,7 @@ class WeekController extends Controller
                             'idTask' => $taskData['option'],
                             'idProject' => $dataId,
                             'idWeeks' => $nbWeek,
+                            'taskIndex' => $taskData['task_index']
                             ],
                             [
                             'plaHours' => $taskData['time'],
