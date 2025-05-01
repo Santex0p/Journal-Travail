@@ -38,7 +38,6 @@ class WeekController extends Controller
         $data = request()->input('data');
 
 
-
         $validatedData = $request->validate([
             'module' => 'required|string|max:255',
             'name' => 'required|string|max:255',
@@ -51,10 +50,12 @@ class WeekController extends Controller
             'nb-1/4-hours' => 'nullable|integer|min:1|max:100',
         ]);
 
-        // Insert data
-
+        // Insert new project data
         if ($data == null)
         {
+            $planningData = null;
+            $journalData = null;
+
             $dataId = DataProject::query()->insertGetId([
                 'idUser' => auth()->id(), // fKey user
                 'datModule' => $request->input('module'),
@@ -117,28 +118,31 @@ class WeekController extends Controller
                 }
             }
             return match ($type) {
-                'planning' => view('planning-weeks' , ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId]),
+                'planning' => view('planning-weeks', ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId, 'planning' => $planningData]),
                 'journal' => view('journal-weeks',['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert]),
                 'diagram' => view('diagram'),
                 default => view('index'),
             };
 
         }
-        // TODO: Fix array values in weekId
         $arrayData = json_decode($data, true);
 
         $tasksToInsert = Tasks::query()->get()->where('idData', $arrayData['id'])->toArray();
         $dataId = DataProject::query()->get()->where('id', $arrayData['id'])->first()->id;
-        $weeksTableId = Weeks::where('idData', $dataId)->pluck('id')->values()->toArray();
-        dd($weeksTableId);
-        foreach ($weeksTableId as $key => $value)
+        $weeksId = Weeks::where('idData', $dataId)->pluck('id')->toArray();
+        $planningData = Planning::query()->get()->where('idProject', $dataId)->toArray();
+        $journalData = Journal::query()->get()->where('idProject', $dataId)->toArray();
+        $joinPlanningTask = Planning::with('task')->get()->toArray();
+        $selectedTaskMapping = [];
+        foreach ($joinPlanningTask as $planning)
         {
-            $weeksId[] = $value['id'];
+            $weekId = $planning['idWeeks']; // To indexing with id of week
+            $selectedTaskMapping[$weekId][$planning['taskIndex']] = $planning; // To Index with week and task index
         }
-        dd($weeksId);
+
 
         return match ($type) {
-            'planning' => view('planning-weeks', ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId]),
+            'planning' => view('planning-weeks', ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId, 'planning' => $planningData, 'selectedTask' => $selectedTaskMapping]),
             'journal' => view('journal-weeks'),
             'diagram' => view('diagram'),
             default => view('index'),
@@ -160,6 +164,7 @@ class WeekController extends Controller
     public function saveData(Request $request) : RedirectResponse
     {
         $weeksData = $request->input('weeks');
+        //dd(request()->input());
         $dataId = $request->input('dataId');
 
         foreach ($weeksData as $nbWeek => $data)
@@ -169,12 +174,12 @@ class WeekController extends Controller
                 switch ($request->input('type')) {
                     case 'journal':
                         Journal::query()->UpdateOrInsert([
-                            'idTask' => $taskData['option'],
                             'idProject' => $dataId,
                             'idWeeks' => $nbWeek,
                             'taskIndex' => $taskData['task_index'],
                             ],
                             [
+                            'idTask' => $taskData['option'],
                             'jouHours' => $taskData['time'],
                             'jouDescription' => $taskData['desc'],
                             'jouLinks' => $taskData['links'],
@@ -183,12 +188,12 @@ class WeekController extends Controller
                         break;
                     case 'planning':
                         Planning::query()->UpdateOrInsert([
-                            'idTask' => $taskData['option'],
                             'idProject' => $dataId,
                             'idWeeks' => $nbWeek,
                             'taskIndex' => $taskData['task_index']
                             ],
                             [
+                            'idTask' => $taskData['option'],
                             'plaHours' => $taskData['time'],
                             'plaDescription' => $taskData['desc'],
                             'plaLinks' => $taskData['links'],
