@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Controller;
 use \App\Http\Controllers\AuthController;
 use \App\Http\Controllers\TaskController;
+use \App\Http\Controllers\DataController;
 
 
 
@@ -24,4 +25,5 @@ Route::get('/login', [AuthController::class, 'index'])->name('login');
 Route::post('/auth', [AuthController::class, 'login'])->name('auth');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/save-weeks', [WeekController::class, 'saveData'])->name('save.weeks');
+Route::post('/del-project', [DataController::class, 'delete'])->name('del.project');
 //Route::fallback(function () {return redirect()->route('dashboard')->with('error', 'Page not found');});

@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('t_tasks', function (Blueprint $table) {
             $table->id();
             $table->string('taskName');
-            $table->string('taskDescription');
+            $table->unsignedTinyInteger('taskCase');
 
-            $table->foreignId('idData')->references('id')->on('t_data')->ondelete('cascade');
+
+            $table->foreignId('idData')->references('id')->on('t_data')->onDelete('cascade');
+            $table->unique(['idData', 'taskCase']);
             $table->index('idData');
             $table->timestamps();
         });

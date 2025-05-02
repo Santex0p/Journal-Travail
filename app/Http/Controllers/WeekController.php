@@ -7,10 +7,12 @@ use App\Models\Journal;
 use App\Models\Planning;
 use App\Models\Tasks;
 use App\Models\Weeks;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Ramsey\Uuid\Rfc4122\Validator;
 use function PHPUnit\Framework\isNumeric;
 use function PHPUnit\Framework\isString;
 
@@ -37,7 +39,6 @@ class WeekController extends Controller
         $nbHours = 10;
         $data = request()->input('data');
 
-
         $validatedData = $request->validate([
             'module' => 'required|string|max:255',
             'name' => 'required|string|max:255',
@@ -50,11 +51,10 @@ class WeekController extends Controller
             'nb-1/4-hours' => 'nullable|integer|min:1|max:100',
         ]);
 
-        // Insert new project data
+        // Create new project data
         if ($data == null)
         {
-            $planningData = null;
-            $journalData = null;
+            $selectedTaskMapping = null;
 
             $dataId = DataProject::query()->insertGetId([
                 'idUser' => auth()->id(), // fKey user
@@ -72,7 +72,7 @@ class WeekController extends Controller
             ]);
 
 
-            // Insert Weeks
+            // Insert Weeks TODO: make the difference between planning and journal weeks
             $weeksId = [];
             for ($i = 1; $i < $nbWeeks; $i++) {
                 $weeksId[] = Weeks::query()->insertGetId([
@@ -84,31 +84,18 @@ class WeekController extends Controller
                     'updated_at' => now(),
                 ]);
             }
-            $rulesTasks = [];
-            $indexTask = 1; // Number of task to validate NOTE: 1 is the first task, no 0
-            foreach ($request->input() as $key => $value) {
-                if (!is_null($request->input($key)) && is_numeric($key)) {
-                    $rulesTasks[$indexTask] = 'nullable|string|max:255';
-                    $indexTask++;
-                }
-            }
-
-            // To validate tasks
-            $validatedTasks = $request->validate($rulesTasks);
 
             $tasksToInsert = [];
-            for ($i = 1; $i < $indexTask; $i++) {
-                if (!empty($validatedTasks[$i])) {
+            foreach ($this->validateTasks($request, false) as $taskIndex => $task) {
                     $tasksToInsert[] = [
-                        'taskName' => $validatedTasks[$i],
-                        'taskDescription' => '',
-                        //'idWeeks' => $weeksId[($i - 1) % count($weeksId)],
+                        'taskName' => trim($task),
                         'idData' => $dataId,
+                        'taskCase' => $taskIndex,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
-                }
             }
+
 
             if (!empty($tasksToInsert)) {
                 foreach ($tasksToInsert as $taskIndex => $task) {
@@ -117,33 +104,70 @@ class WeekController extends Controller
 
                 }
             }
-            return match ($type) {
-                'planning' => view('planning-weeks', ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId, 'planning' => $planningData]),
-                'journal' => view('journal-weeks',['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert]),
-                'diagram' => view('diagram'),
-                default => view('index'),
-            };
 
         }
-        $arrayData = json_decode($data, true);
-
-        $tasksToInsert = Tasks::query()->get()->where('idData', $arrayData['id'])->toArray();
+        else
+        {
+        $arrayData = json_decode($data, true); // To decode data
         $dataId = DataProject::query()->get()->where('id', $arrayData['id'])->first()->id;
         $weeksId = Weeks::where('idData', $dataId)->pluck('id')->toArray();
-        $planningData = Planning::query()->get()->where('idProject', $dataId)->toArray();
         $journalData = Journal::query()->get()->where('idProject', $dataId)->toArray();
-        $joinPlanningTask = Planning::with('task')->get()->toArray();
+        $joinPlanningTask = Planning::whereHas('task', function ($query) use ($dataId) {$query->where('idData', $dataId);})->with('task')->get()->toArray(); // WhereHas used to have the idData of task table
+        $joinJournalTask = Journal::whereHas('task', function ($query) use ($dataId) {$query->where('idData', $dataId);})->with('task')->get()->toArray();
         $selectedTaskMapping = [];
-        foreach ($joinPlanningTask as $planning)
-        {
-            $weekId = $planning['idWeeks']; // To indexing with id of week
-            $selectedTaskMapping[$weekId][$planning['taskIndex']] = $planning; // To Index with week and task index
+        $validated = $this->validateTasks($request, true);
+
+
+        $toUpsert = [];
+        foreach ($validated as $case => $taskName) {
+            $taskName = trim($taskName);
+            if($taskName != '')
+            {
+                $toUpsert[] = [
+                    'idData' => $dataId,
+                    'taskName' => $taskName,
+                    'taskCase' => $case,
+                ];
+            }
+        }
+
+        // To Update Or Insert Tasks
+        Tasks::upsert($toUpsert, ['idData', 'taskCase'],['taskName', 'updated_at']);
+
+        // Array filter get value in trim and ignore null values, array keys got the id of array and array to convert in int the keys
+        $submittedCases = array_map(
+            'intval', array_keys(array_filter($validated, fn($name) => trim($name) !== ''))
+        );
+
+        // To delete all records where there are no tasks because submitted class have only valid tasks
+        Tasks::where('idData', $dataId)->whereNotIn('taskCase', $submittedCases)->delete();
+
+
+        // Fill data tasks according to type
+        switch ($type) {
+            case 'planning':
+                foreach ($joinPlanningTask as $planning)
+                {
+                    $weekId = $planning['idWeeks']; // To indexing with id of week
+                    $selectedTaskMapping[$weekId][$planning['taskIndex']] = $planning; // To Index with week and task index
+                }
+                break;
+            case 'journal':
+                foreach ($joinJournalTask as $journal)
+                {
+                    $weekId = $journal['idWeeks'];
+                    $selectedTaskMapping[$weekId][$journal['taskIndex']] = $journal;
+                }
+                break;
+        }
+
+        $tasksToInsert = Tasks::query()->get()->where('idData', $arrayData['id'])->toArray(); // After upsert
         }
 
 
         return match ($type) {
-            'planning' => view('planning-weeks', ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId, 'planning' => $planningData, 'selectedTask' => $selectedTaskMapping]),
-            'journal' => view('journal-weeks'),
+            'planning' => view('planning-weeks', ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId, 'selectedTask' => $selectedTaskMapping]),
+            'journal' => view('journal-weeks', ['nbWeeks' => $nbWeeks, 'nbFields' => $nbFields, 'nbHours' => $nbHours, 'tasksToInsert' => $tasksToInsert, 'dataId' => $dataId, 'weeksId' => $weeksId, 'selectedTask' => $selectedTaskMapping]),
             'diagram' => view('diagram'),
             default => view('index'),
         };
@@ -207,5 +231,27 @@ class WeekController extends Controller
 
 
         return redirect()->route('dashboard')->with('success', 'Data saved');
+    }
+
+    // To Validate incoming tasks from data
+    private function validateTasks(Request $request, bool $withNull): array
+    {
+        $rulesTasks = [];
+        foreach ($request->input() as $key => $value) {
+            if ($withNull) {
+                if (is_numeric($key)) {
+                    $rulesTasks[$key] = 'nullable|string|max:255';
+                }
+            }
+            else
+            {
+                if (!is_null($request->input($key)) && is_numeric($key)) {
+                    $rulesTasks[$key] = 'nullable|string|max:255';
+                }
+
+            }
+        }
+        // To validate tasks
+        return $validatedTasks = $request->validate($rulesTasks);
     }
 }

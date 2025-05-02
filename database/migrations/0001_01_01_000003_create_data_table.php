@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('datNbHour')->nullable();
             $table->integer('datNbPeriod')->nullable();
 
-            $table->foreignId('idUser')->references('id')->on('users')->ondelete('cascade');
+            $table->foreignId('idUser')->references('id')->on('users')->onDelete('cascade');
             $table->index('idUser');
             $table->timestamps();
         });

@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('t_journal', function (Blueprint $table) {
             $table->id();
             $table->integer('jouHours');
-            $table->string('jouDescription');
-            $table->string('jouLinks');
+            $table->string('jouDescription')->nullable();
+            $table->string('jouLinks')->nullable();
             $table->string('taskIndex');
 
-            $table->foreignId('idTask')->references('id')->on('t_tasks')->ondelete('cascade');
+            $table->foreignId('idTask')->references('id')->on('t_tasks')->onDelete('cascade');
             $table->index('idTask');
-            $table->foreignId('idProject')->references('id')->on('t_data')->ondelete('cascade');
+            $table->foreignId('idProject')->references('id')->on('t_data')->onDelete('cascade');
             $table->index('idProject');
             $table->foreignId('idWeeks')->constrained('t_weeks')->onDelete('cascade');
             $table->index('idWeeks');

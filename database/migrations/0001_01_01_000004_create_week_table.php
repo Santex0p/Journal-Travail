@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('weeStartDate');
             $table->date('weeEndDate');
 
-            $table->foreignId('idData')->references('id')->on('t_data')->ondelete('cascade');
+            $table->foreignId('idData')->references('id')->on('t_data')->onDelete('cascade');
             $table->index('idData');
             $table->timestamps();
         });

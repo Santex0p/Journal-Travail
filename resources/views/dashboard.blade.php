@@ -15,6 +15,7 @@
     </head>
     <body class="">
         <header class="">
+            <h1>LE PLANIFICATEUR 3000</h1>
                 <nav class="">
                 </nav>
         </header>
@@ -56,7 +57,9 @@
                         <input type="hidden" name="dataId" value="{{$project['id']}}">
                         <button><img src="{{asset('img/pencil.png')}}" alt="edit"></button>
                         </form>
-                        <form action="/del-project" method="GET">
+                        <form action="/del-project" method="POST">
+                            @csrf
+                            <input type="hidden" name="dataId" value="{{$project['id']}}">
                             <button><img src="{{asset('img/trash.png')}}" alt="delete"></button>
                         </form>
                     </td>
