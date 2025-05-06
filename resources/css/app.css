@@ -1,152 +1,517 @@
 @import 'tailwindcss';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* ==========================
+   Tema: Variables de colores y fuentes
+   ========================== */
+:root {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --color-header-bg:       #5C6BC0;    /* Fondo del título principal */
+    --color-nav-bg:          #6784D6;    /* Fondo de la barra de navegación */
+    --color-primary:         #42A5F5;    /* Color principal para botones */
+    --color-primary-hover:   #1E88E5;    /* Hover de botones principales */
+    --color-secondary:       #E0E0E0;    /* Color secundario para bordes/fondos */
+    --color-bg:              #F5F5F5;    /* Fondo de la aplicación */
+    --color-card-bg:         #FFFFFF;    /* Fondo de tarjetas y contenedores */
+    --color-text-primary:    #212121;    /* Color de texto principal */
+    --color-text-secondary:  #616161;    /* Color de texto secundario */
+    --color-error:           #E57373;    /* Rojo para errores y logout */
+    --color-error-light:     #EF9A9A;    /* Rojo pastel para Journal */
+    --color-success:         #66BB6A;    /* Verde para Planning */
+    --color-success-light:   #A5D6A7;    /* Verde suave para Planning */
 }
 
+/* ==========================
+   Reset y estilo base
+   ========================== */
+*, *::before, *::after {
+    box-sizing: border-box;   /* Incluye padding y borde en ancho/alto */
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+}
 
-
-.content form {
+/* ==========================
+   Header y Navegación
+   ========================== */
+header { margin: 0; padding: 0; }
+header .app-title {
+    background-color: var(--color-header-bg);
+    color: #FFF;
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+header nav {
+    background-color: var(--color-nav-bg);
     display: flex;
     justify-content: center;
-
+    padding: 0.5rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+header nav a {
+    color: #FFF;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 1rem;
 }
 
-.content-user   {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.journal-table {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.journal-table form {
-    display: inline-flex;
-    width: 25px;
-    margin: 5px;
-}
-
-.journal-table img {
+/* ==========================
+   Botones generales
+   ========================== */
+button, .btn {
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
     cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+button:hover, .btn:hover {
+    opacity: 0.9;
+}
+/* Primarios */
+button.primary,
+.btn-creation-diagram,
+.btn-creation-planning,
+.btn-creation-journal,
+.btn-create-journal,
+.btn-view,
+.btn-save {
+    background-color: var(--color-primary);
+    color: #FFF;
+}
+button.primary:hover,
+.btn-creation-diagram:hover,
+.btn-creation-planning:hover,
+.btn-creation-journal:hover,
+.btn-create-journal:hover,
+.btn-view:hover,
+.btn-save:hover {
+    background-color: var(--color-primary-hover);
+}
+/* Secundarios */
+button.secondary, .btn-secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-text-primary);
+}
+/* Logout/Error */
+.btn-logout {
+    background-color: var(--color-error);
+    color: #FFF;
 }
 
+/* ==========================
+   Contenedores flexibles
+   ========================== */
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+/* ==========================
+   Tarjetas (Cards)
+   ========================== */
+.card, .login-card, .dashboard-card {
+    background-color: var(--color-card-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 2rem;
+}
+
+/* ==========================
+   Página de Login
+   ========================== */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.login-card {
+    width: 320px;
+    text-align: center;
+}
+.login-form .form-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+.login-form label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+.login-form input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-secondary);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.login-form input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(66,165,245,0.2);
+}
+.login-form .form-footer {
+    margin-top: 1.5rem;
+}
+.login-form .error-msg {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--color-error);
+}
+
+/* ==========================
+   Dashboard
+   ========================== */
+.dashboard-container {
+    display: flex;
+    justify-content: center;
+}
+.dashboard-card {
+    width: 100%;
+    max-width: 800px;
+}
+.content-user {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.info-user p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+}
 .buttons-content {
     display: flex;
-    gap: 10px;
-    margin: 10px;
+    gap: 1rem;
 }
 
-.buttons-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Espacio entre los botones */
-    align-items: flex-start; /* Alinea los botones a la izquierda */
-    margin-left: 20px;
-
+/* ==========================
+   Tabla de Journals (Dashboard)
+   ========================== */
+.journal-table {
+    margin-top: 2rem;
 }
-
-.buttons-form button {
-    border: 1px solid #000000;
-    cursor: pointer;
-}
-
-.td-select {
-    border-left: 1px solid #000000;
-}
-
-textarea{
-    display: block;
-    border-left: 1px solid #000000;
-    resize: none;
-    height: auto;
-}
-
-input {
-    border-left: 1px solid #000000;
-}
-
-select {
+.journal-table table {
     width: 100%;
-    cursor: pointer;
-}
-
-table {
     border-collapse: collapse;
-    margin-bottom: 30px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-
-.section-1 {
-    margin-bottom: 30px;
-    border-bottom: 1px solid #000000;
-}
-
-.task-title {
-    text-align: center;
-    font-size: 1.5rem;
-    padding: 1rem 0;
-    font-weight: bold;
-}
-
-.week-space {
-    display: flex;
-    justify-content: center;
-}
-
-tr {
-    border: 1px solid #000000;
-}
-
+/* Celdas */
+.journal-table th,
 .journal-table td {
-    border-left: 1px solid #000000;
-    padding: 10px;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-secondary);
+}
+.journal-table tr:last-child td {
+    border-bottom: none;
+}
+/* Hover fila */
+.journal-table tr:hover td {
+    background-color: rgba(66,165,245,0.1);
+}
+/* Iconos en línea */
+.journal-table td form {
+    display: inline-flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+.journal-table td form button {
+    padding: 0.5rem;
+}
+.journal-table td form button img {
+    width: 1.2rem;
+    height: 1.2rem;
+    object-fit: contain;
 }
 
-.user-info td {
-    border-left: 1px solid #000000;
-    padding: 10px;
+/* ==========================
+   Header Dashboard Journal (azul original)
+   ========================== */
+.dashboard-card .journal-table table thead {
+    background-color: var(--color-nav-bg); /* Mantiene azul */
+}
+.dashboard-card .journal-table table thead th {
+    color: #FFF;
+    border-bottom: none;
 }
 
-.week-title {
-    background-color: rgba(191, 227, 213, 0.75);
+/* ==========================
+   Barra sticky Journal
+   ========================== */
+.journal-actions {
+    position: sticky;
+    top: 80px; /* Ajustar según altura header+nav */
+    background-color: var(--color-card-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-secondary);
+    z-index: 20;
 }
 
-.week-table {
-    margin-bottom: 30px;
+/* ==========================
+   Header Journal-Weeks (rojo pastel)
+   ========================== */
+.journal-container .journal-table table thead {
+    background-color: var(--color-error-light);
+}
+.journal-container .journal-table table thead th {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid var(--color-error);
 }
 
-/* Buttons */
-.btn-logout {
-    padding: 0.5em 1.2em;
-    font-size: 0.9rem;
-    border: none;
+/* ==========================
+   Project Data
+   ========================== */
+.content {
+    padding-bottom: 4em;
+}
+
+.content table {
+    width: 100%;
+    max-width: 800px;
+    margin: 1.5rem auto;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05)
+}
+.content table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-secondary);
+}
+.content table tr:last-child td {
+    border-bottom: none;
+}
+.content table tr:nth-child(even) td {
+    background-color: rgba(0,0,0,0.03);
+}
+.content table tr:hover td {
+    background-color: rgba(66,165,245,0.1);
+}
+.content input[type="text"],
+.content textarea,
+.content select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-secondary);
     border-radius: 4px;
-    background-color: #e64553 !important;
-    color: white;
+    font-size: 0.95rem;
+    background-color: var(--color-bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.content input:focus,
+.content textarea:focus,
+.content select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(66,165,245,0.2);
+}
+
+/* ==========================
+   Barra sticky Planning
+   ========================== */
+.planning-actions {
+    position: sticky;
+    top: 80px; /* Ajustar según altura header+nav */
+    background-color: var(--color-card-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-secondary);
+    z-index: 20;
+}
+
+/* ==========================
+   Planning & Journal Containers
+   ========================== */
+.planning-container,
+.journal-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+/* Espacio entre semanas */
+.week-space {
+    margin: 1.5rem 0;
+}
+
+/* Fecha de la semana */
+.week-space p.date-week {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* ==========================
+   Base styling para week-table
+   (aplica a Planning y Journal)
+   ========================== */
+.planning-container .week-table,
+.journal-container .week-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+}
+.planning-container .week-table th,
+.planning-container .week-table td,
+.journal-container .week-table th,
+.journal-container .week-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-secondary);
+}
+.planning-container .week-table tr:last-child td,
+.journal-container .week-table tr:last-child td {
+    border-bottom: none;
+}
+.planning-container .week-table tr:nth-child(even) td,
+.journal-container .week-table tr:nth-child(even) td {
+    background-color: rgba(0,0,0,0.03);
+}
+.planning-container .week-table tr:hover td,
+.journal-container .week-table tr:hover td {
+    background-color: rgba(0,0,0,0.05);
+}
+
+/* ==========================
+   Planning header (verde suave)
+   ========================== */
+.planning-container .week-table thead {
+    background-color: var(--color-success-light);
+}
+.planning-container .week-table thead th {
+    color: var(--color-text-primary);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--color-success);
+}
+
+/* ==========================
+   Journal header (rojo pastel)
+   ========================== */
+.journal-container .week-table thead {
+    background-color: var(--color-error-light);
+}
+.journal-container .week-table thead th {
+    color: var(--color-text-primary);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--color-error);
+}
+
+
+/* ==========================
+   Textareas de week-table más accesibles
+   ========================== */
+.week-table td textarea {
+    width: 100%;              /* Ocupa todo el ancho de la celda */
+    height: 100%;             /* Ocupa todo el alto disponible */
+    min-height: 4rem;         /* Asegura una altura mínima cómoda */
+    padding: 0.75rem;         /* Espacio interno generoso */
+    border: 2px solid var(--color-secondary);  /* Borde más grueso */
+    border-radius: 4px;
+    background-color: #fafafa; /* Fondo ligeramente contrastado */
+    resize: vertical;         /* Permite redimensionar solo en vertical */
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.week-table td textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);                /* Borde azul al foco */
+    box-shadow: 0 0 0 2px rgba(66,165,245,0.2);         /* Luz suave en foco */
+    background-color: #fff;                             /* Fondo blanco en foco */
+}
+
+
+.planning-container select,
+.journal-container select {
     cursor: pointer;
 }
 
-.btn-create-journal {
-    background-color: #25c09c !important;
-    padding: 0.5em 1.2em;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
+
+/* ==========================
+   Botonera fija inferior siempre visible
+   ========================== */
+.week-actions-bottom {
+    position: fixed;        /* fija al viewport */
+    bottom: 0;              /* en el pie de la pantalla */
+    left: 0;
+    right: 0;
+    background: var(--color-card-bg);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-secondary);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+    z-index: 999;           /* por encima de todo */
 }
 
+/* Si quieres limitar el ancho al de tu contenedor central: */
+.planning-container .week-actions-bottom,
+.journal-container .week-actions-bottom {
+    max-width: 900px;
+    margin: 0 auto;
+}
 
-.btn-logout:hover, .btn-create-journal:hover {
-    opacity: 0.8;
+/* ==========================
+   Espacio extra al final para no tapar contenido
+   ========================== */
+.planning-container,
+.journal-container {
+    /* Asume que tu barra mide aprox. 3.5rem de alto */
+    padding-bottom: 4rem;
+}
+
+/* ==========================
+   Barra fija inferior centrada
+   ========================== */
+.week-actions-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    /* Igual que tu .planning-container / .journal-container: */
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto;
+
+    background: var(--color-card-bg);
+    display: flex;
+    justify-content: space-between; /* un botón a la izq, otro a la dcha */
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-secondary);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+    z-index: 999;
+    box-sizing: border-box;
+}
+
+/* Espacio inferior para que no tape contenido */
+.planning-container,
+.journal-container {
+    padding-bottom: 4rem; /* ajústalo a la altura de la barra */
 }
 

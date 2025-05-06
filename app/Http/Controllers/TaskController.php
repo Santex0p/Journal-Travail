@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataProject;
+use App\Models\Journal;
 use App\Models\Planning;
 use App\Models\Tasks;
 use Dflydev\DotAccessData\Data;
@@ -17,15 +18,19 @@ class TaskController extends Controller
     public function create(Request $request): View
     {
 
+
         if ($request->input('dataId') !== null) {
             $dataId = $request->input('dataId');
             $data = DataProject::query()->get()->where('id', $dataId)->first();
             $dataTasks = Tasks::query()->get()->where('idData', $dataId)->select('taskName', 'id');
-            $planningData = Planning::query()->get()->toArray();
+            $planningData = Planning::where('idProject', $dataId)->first();
+            $journalData = Journal::where('idProject', $dataId)->first();
         }
         else
         {
             $data = null;
+            $planningData = null;
+            $journalData = null;
         }
         //dd($planningData);
 
@@ -53,7 +58,7 @@ class TaskController extends Controller
         }
         //dd($tasks);
 
-        return view('project-data', ['tasks' => $tasks, 'data' => $data]);
+        return view('project-data', ['tasks' => $tasks, 'data' => $data, 'planning' => $planningData ?? null, 'journal' => $journalData ?? null]);
 
     }
 }

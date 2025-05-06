@@ -13,63 +13,69 @@
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="">
-        <header class="">
-            <h1>LE PLANIFICATEUR 3000</h1>
-                <nav class="">
-                </nav>
-        </header>
-        <div class="content-user">
-                <table class="user-info">
-                    <tr>
-                        <td>{{Auth::user()->name}}</td>
-                        <td>{{Auth::user()->email}}</td>
-                    </tr>
-                </table>
-            <div class="buttons-content">
-                <form action="/logout" method="POST">
-                    @csrf
-                    <button class="btn-logout" type="submit">Logout</button>
-                </form>
-                <form action="/data" method="POST">
-                    @csrf
-                    <button class="btn-create-journal" type="submit">Créer un nouveau project</button>
-                </form>
-            </div>
-        </div>
-        <div class="journal-table">
-            @if($projects != null)
-            <table>
-                <thead>
-                <tr>
-                    <th>Mes Journals</th>
-                    <th>Options</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($projects as $project)
-                <tr>
-                    <td>{{$project['datModule']}}</td>
-                    <td>
-                        <form action="/data" method="POST">
+    <body>
+    <header>
+        <h1 class="app-title">Planify</h1>
+        <nav>
+            <a href="/">Dashboard</a>
+        </nav>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <!-- Info de usuario y botones -->
+            <div class="content-user">
+                <div class="info-user">
+                    <p>Bienvenue {{ Auth::user()->name }}</p>
+                    <p>Email: {{ Auth::user()->email }}</p>
+                </div>
+                <div class="buttons-content">
+                    <form action="/logout" method="POST">
                         @csrf
-                        {{--Data Id in hidden to have acces to data in the next page--}}
-                        <input type="hidden" name="dataId" value="{{$project['id']}}">
-                        <button><img src="{{asset('img/pencil.png')}}" alt="edit"></button>
-                        </form>
-                        <form action="/del-project" method="POST">
-                            @csrf
-                            <input type="hidden" name="dataId" value="{{$project['id']}}">
-                            <button><img src="{{asset('img/trash.png')}}" alt="delete"></button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-                </tbody>
+                        <button class="btn-logout" type="submit">Logout</button>
+                    </form>
+                    <form action="/data" method="POST">
+                        @csrf
+                        <button class="btn-create-journal" type="submit">Créer un nouveau project</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de journals -->
+            <div class="journal-table">
+                @if($projects != null)
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Mes Journals</th>
+                            <th>Options</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($projects as $project)
+                            <tr>
+                                <td>{{ $project['datModule'] }}</td>
+                                <td>
+                                    <form action="/data" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="dataId" value="{{ $project['id'] }}">
+                                        <button><img src="{{ asset('img/pencil.png') }}" alt="edit"></button>
+                                    </form>
+                                    <form action="/del-project" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="dataId" value="{{ $project['id'] }}">
+                                        <button><img src="{{ asset('img/trash.png') }}" alt="delete"></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
                 @else
                     <p>Aucun projet pour l'instant</p>
                 @endif
-            </table>
+            </div>
         </div>
+    </div>
     </body>
 </html>

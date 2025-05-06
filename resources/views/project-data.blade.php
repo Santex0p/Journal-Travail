@@ -15,9 +15,10 @@
     </head>
     <body class="">
         <header class="">
-                <nav class="">
-                    <a href="/">Dashboard</a>
-                </nav>
+            <h1 class="app-title">Planify</h1>
+            <nav class="">
+                <a href="/">Dashboard</a>
+            </nav>
         </header>
         <div class="content">
             <form action="/weeks" method="POST">
@@ -76,10 +77,10 @@
                 @endforeach
             </table>
                 <input type="hidden" name="data" value="{{$data}}">
-            <div class="buttons-form">
-                <button type="submit" class="btn btn-creation-diagram" name="type" value="diagram">Création diagramme</button>
-                <button type="submit" class="btn btn-creation-diagram" name="type" value="planning">@if(isset($data->id)) Voir PLanning @else Creation Planning @endif </button>
-                <button type="submit" class="btn btn-creation-diagram" name="type" value="journal">Création Journal de travail</button>
+            <div class="week-actions-bottom">
+                {{--<button type="submit" class="btn-view" name="type" value="diagram">Création diagramme</button>--}}
+                <button type="submit" class="btn-view" name="type" value="planning">@if($planning) Voir Planning @else Creation Planning @endif </button>
+                <button type="submit" class="btn-view" name="type" value="journal">@if($journal) Voir Journal @else Creation Journal @endif</button>
             </div>
             </form>
         </div>

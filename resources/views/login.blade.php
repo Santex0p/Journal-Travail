@@ -19,22 +19,30 @@
                 </nav>
         </header>
         <div class="login-container">
-            <form action="/auth" method="POST">
-                @csrf
-                <table>
-                <tr>
-                    <td>
-                        <label for="email">Utilisateur:</label>
-                        <input type="text" name="email" id="password">
-                    </td>
-                    <td>
-                        <label for="password">Mot de passe:</label>
-                        <input type="password" name="password" id="password">
-                    <td>
-                </tr>
-                </table>
-                <button type="submit">Login</button>
-            </form>
+            <div class="login-card">
+                <h1 class="login-title">
+                    Bienvenue au <span class="brand">Planify</span>
+                </h1>
+                <form method="POST" action="{{ route('auth') }}" class="login-form">
+                    @csrf
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input id="email" type="email" name="email" required autofocus>
+                        @error('email') <p class="error-msg">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+                        <input id="password" type="password" name="password" required>
+                        @error('password') <p class="error-msg">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="form-footer">
+                        <button type="submit" class="primary">Login</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </body>
 </html>

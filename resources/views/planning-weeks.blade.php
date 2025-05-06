@@ -15,19 +15,22 @@
 </head>
 <body class="">
 <header class="">
+    <h1 class="app-title">Planify</h1>
     <nav class="">
+        <a href="/">Dashboard</a>
     </nav>
 </header>
-
+<div class="planning-container">
 <div class="week-space">
-    <form action="/save-weeks" method="POST">
+        <form id="main-form" action="/save-weeks" method="POST">
         @csrf
         @php $input = 1 @endphp
         @foreach($weeksId as $weekId)
+            <p>Debut: <input class="date-week" type="date" name="start-date-week"></p>
             <table class="week-table">
                 <thead>
                 <tr>
-                    <th colspan="4" class="week-title">Semaine {{$input++}}</th>{{--To number the weeks--}}
+                    <th colspan="4" class="week-title-planning">Semaine {{$input++}}</th>{{--To number the weeks--}}
                 </tr>
                 <tr>
                     <th>Tâche</th>
@@ -66,19 +69,17 @@
             </table>
         @endforeach
         <input type="hidden" name="dataId" value="{{$dataId}}">
-        <button type="submit" name="type" value="planning">Sauvegarder</button>
+
     </form>
-    <form action="/data" method="POST">
+    <form id="view-form" action="/data" method="POST">
         @csrf
-        <table>
-            <tr>
-                <td>
-                    <input type="hidden" name="dataId" value="{{$dataId}}">
-                    <button type="submit">Voir Data</button>
-                </td>
-            </tr>
-        </table>
+        <input type="hidden" name="dataId" value="{{$dataId}}">
     </form>
+    <div class="week-actions-bottom">
+        <button type="submit" form="view-form" class="btn-view">Voir Data</button>
+        <button type="submit" form="main-form" name="type" value="planning" class="btn-save">Sauvegarder</button>
+    </div>
+</div>
 </div>
 </body>
 </html>

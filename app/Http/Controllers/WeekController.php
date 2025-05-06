@@ -190,6 +190,7 @@ class WeekController extends Controller
         $weeksData = $request->input('weeks');
         //dd(request()->input());
         $dataId = $request->input('dataId');
+        //dd($dataId, $weeksData);
 
         foreach ($weeksData as $nbWeek => $data)
         {
